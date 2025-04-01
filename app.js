@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2');
 const app = express();
-
+const moment = require('moment-jalaali');
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -77,7 +77,14 @@ app.get('/myposts', authenticateToken, (req, res) => {
       console.log(err);
       return res.status(500).json({ error: 'Database error' });
     }
-    res.json(results);
+
+    // Convert created_at to Jalali date
+    const formattedResults = results.map(post => ({
+      ...post,
+      created_at: moment(post.created_at).format('jYYYY/jMM/jDD HH:mm')
+    }));
+
+    res.json(formattedResults);
   });
 });
 
